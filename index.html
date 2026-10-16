@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OFT — Launch a coin. Go omnichain.</title>
+<meta name="description" content="An omnichain launchpad: create one token with one supply across Solana, Ethereum, Base and more, using LayerZero's OFT standard.">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="mark.png">
+<meta property="og:title" content="OFT — Launch a coin. Go omnichain.">
+<meta property="og:image" content="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ECE5D3; --bg2:#E3DAC5; --panel:#F4EFE3; --ink:#1B1912; --muted:#625C4E; --faint:#8F8775;
+  --line:rgba(27,25,18,.14); --line2:rgba(27,25,18,.26);
+  --c1:#C92B2B; --c2:#C96A08; --c3:#9C8400; --c4:#1E8E2C; --c5:#0B8794; --c6:#2C46D6; --c7:#A12BBE;
+  --acc:var(--c5);
+  --bezel:#D6CBB2; --bezel-hi:#E9E0CB; --bezel-dk:#9E937B; --bezel-ink:#2A261C;
+  --screen:#040B08; --scr-ink:#E2F2EA; --scr-dim:#557066; --scr-line:#1A2B25;
+  --s1:#FF4040; --s2:#FF9A1F; --s3:#FFE53B; --s4:#4BF05A; --s5:#2EE6F0; --s6:#4A6BFF; --s7:#E04BFF;
+  --rainbow:linear-gradient(90deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5),var(--c6),var(--c7));
+  --scr-rainbow:linear-gradient(90deg,var(--s1),var(--s2),var(--s3),var(--s4),var(--s5),var(--s6),var(--s7));
+  --sans:"Pixelify Sans","VT323","Courier New",monospace;
+  --px:"VT323","Courier New",Courier,monospace;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000; --bg2:#090B0A; --panel:#070808; --ink:#EDE6D8; --muted:#8E887A; --faint:#5A554B;
+    --line:rgba(237,230,216,.09); --line2:rgba(237,230,216,.2);
+    --c1:#FF4040; --c2:#FF9A1F; --c3:#FFE53B; --c4:#4BF05A; --c5:#2EE6F0; --c6:#6A86FF; --c7:#E04BFF;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000000; --bg2:#090B0A; --panel:#070808; --ink:#EDE6D8; --muted:#8E887A; --faint:#5A554B;
+  --line:rgba(237,230,216,.09); --line2:rgba(237,230,216,.2);
+  --c1:#FF4040; --c2:#FF9A1F; --c3:#FFE53B; --c4:#4BF05A; --c5:#2EE6F0; --c6:#6A86FF; --c7:#E04BFF;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 76px);-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;-webkit-font-smoothing:none;font-smooth:never;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;overflow-x:hidden}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:100;background:repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+img{max-width:100%;display:block}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+.tag{font-family:var(--px);font-size:18px;color:var(--faint);line-height:1.2}
+.tag-line{display:inline-block;border-top:1px solid var(--line2);padding-top:4px}
+.rb{background:var(--rainbow);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--rainbow);opacity:.55}
+.top .wrap{display:flex;align-items:center;gap:20px;height:72px;max-width:1440px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:600;font-size:26px;letter-spacing:0}
+.brand img{width:40px;height:40px;border-radius:4px}
+.cursor{display:inline-block;width:.5em;height:.09em;background:var(--rainbow);margin-left:2px;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.cursor{animation:none}}
+nav.links{display:flex;gap:30px;margin:0 auto}
+nav.links a{text-decoration:none;color:var(--muted);font-size:16px}
+nav.links a:hover{color:var(--ink)}
+.status{display:flex;align-items:center;gap:8px;font-family:var(--px);font-size:17px;color:var(--faint);white-space:nowrap}
+.leds{display:flex;gap:3px}.leds i{width:6px;height:6px;border-radius:50%}
+@media (max-width:980px){nav.links{display:none}.status{margin-left:auto}}
+@media (max-width:560px){.status{display:none}.brand{margin-right:auto}}
+
+.bz{appearance:none;border:0;cursor:pointer;text-decoration:none;background:var(--bezel);color:var(--bezel-ink);font-weight:600;font-size:15px;padding:11px 16px;border-radius:3px;display:inline-flex;align-items:center;gap:10px;white-space:nowrap;box-shadow:inset 2px 2px 0 var(--bezel-hi),inset -2px -2px 0 var(--bezel-dk),0 2px 0 rgba(0,0,0,.35)}
+.bz:hover{filter:brightness(1.05)}
+.bz:active{box-shadow:inset -2px -2px 0 var(--bezel-hi),inset 2px 2px 0 var(--bezel-dk);transform:translateY(1px)}
+.bz:disabled{opacity:.5;cursor:not-allowed}
+.bz .pwr{width:9px;height:9px;border-radius:1px;background:#4A4334}
+.bz.on .pwr{background:#4BF05A;box-shadow:0 0 8px #4BF05A}
+.ghost{appearance:none;background:none;border:1px solid var(--line2);color:var(--ink);cursor:pointer;padding:11px 16px;border-radius:3px;font-size:15px;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.ghost:hover{border-color:var(--ink)}
+.xlink{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border:1px solid var(--line2);border-radius:3px;color:var(--ink);text-decoration:none;flex-shrink:0}
+.xlink:hover{border-color:var(--ink);color:var(--c5)}
+.xlink svg{width:17px;height:17px;fill:currentColor}
+.wallet-wrap{position:relative}
+.wmenu{position:absolute;right:0;top:calc(100% + 8px);min-width:260px;background:var(--panel);border:1px solid var(--line2);border-radius:4px;padding:14px;display:none;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.wmenu.open{display:block}
+.wmenu .addr{font-family:var(--px);font-size:20px;word-break:break-all;line-height:1.1}
+.wmenu .bal{color:var(--muted);font-size:14px;margin:6px 0 12px}
+.wmenu button{width:100%;text-align:left;background:none;border:0;padding:8px 0;border-top:1px solid var(--line);cursor:pointer;color:var(--ink);font-size:15px}
+.wmenu button:hover{color:var(--acc)}
+
+/* hero */
+.hero{padding:56px 0 40px}
+.hero-meta{display:flex;justify-content:space-between}
+.hero .eyebrow{text-align:center;margin-top:24px}
+.hero h1{font-weight:500;font-size:clamp(42px,7.6vw,108px);line-height:.98;letter-spacing:0;margin:40px 0 0;text-align:center}
+.hero h1 .l2{display:block}
+.hero-grid{display:grid;grid-template-columns:1fr minmax(280px,560px) 1fr;align-items:center;gap:24px;margin-top:20px}
+.side{font-family:var(--px);font-size:19px;line-height:1.3;color:var(--muted)}
+.side .k{margin-bottom:14px}
+.side .rule{width:90px;height:1px;background:var(--line2);margin-top:18px}
+.side.r{text-align:right}.side.r .rule{margin-left:auto}
+figure.logo{margin:0;position:relative}
+figure.logo::before{content:"";position:absolute;inset:14% 12%;background:conic-gradient(from 0deg,rgba(255,64,64,.18),rgba(255,229,59,.18),rgba(75,240,90,.18),rgba(46,230,240,.18),rgba(224,75,255,.18),rgba(255,64,64,.18));filter:blur(40px);border-radius:50%}
+figure.logo img{position:relative;width:100%;border-radius:14px}
+figure.logo figcaption{text-align:center;margin-top:6px}
+.hero-sub{text-align:center;margin-top:28px}
+.hero-sub p{font-size:clamp(20px,2.4vw,30px);margin:0;letter-spacing:0}
+.hero-sub p + p{font-size:17px;color:var(--muted);margin:6px auto 0;max-width:40em}
+.cta{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:28px}
+@media (max-width:820px){.hero-grid{grid-template-columns:1fr}.side{display:none}}
+
+.chainstrip{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:40px}
+.chip{appearance:none;background:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line2);border-radius:2px;padding:5px 11px;font-family:var(--px);font-size:19px;color:var(--ink)}
+.chip i{width:8px;height:8px;display:block}
+.chip.soon{color:var(--faint)}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.mon{margin:0;max-width:560px;width:100%;justify-self:center}
+.mon .crt{padding:26px 26px 30px}
+.mon .glass{aspect-ratio:4/3;background:radial-gradient(ellipse at 50% 55%,#06150F,#020605 70%)}
+.mon canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;touch-action:pan-y;cursor:grab}
+#glg{filter:blur(7px) saturate(1.5);opacity:.85;pointer-events:none}
+.glabels{position:absolute;inset:0;pointer-events:none}
+.glab{position:absolute;left:0;top:0;font-family:var(--px);font-size:17px;line-height:1;white-space:nowrap;text-shadow:0 0 6px currentColor;transition:opacity .2s}
+.hud{position:absolute;left:12px;right:12px;display:flex;white-space:nowrap;justify-content:space-between;gap:10px;font-family:var(--px);font-size:16px;color:var(--scr-dim);pointer-events:none;z-index:2}
+.hud.top{top:9px}.hud.bot{bottom:9px}
+#gevent{color:var(--s4)}
+.mon .neck{width:30%;height:20px;margin:0 auto;background:var(--bezel);box-shadow:inset 3px 0 0 var(--bezel-hi),inset -4px -3px 0 var(--bezel-dk)}
+.mon .base{width:58%;height:20px;margin:0 auto;background:var(--bezel);border-radius:3px;box-shadow:inset 3px 3px 0 var(--bezel-hi),inset -4px -4px 0 var(--bezel-dk),0 16px 30px rgba(0,0,0,.4)}
+.mon figcaption{text-align:center;margin-top:12px}
+@media (max-width:560px){.hud{font-size:14px;left:9px;right:9px}.hud.top{top:6px}.hud.bot{bottom:6px}.hud .sup2{display:none}.hud.top span:first-child{display:none}.glab{font-size:14px}.mon .crt{padding:14px 14px 18px}}
+
+section.sec{padding:110px 0;border-top:1px solid var(--line)}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:48px}
+.sec-head h2{font-weight:500;font-size:clamp(34px,4.6vw,60px);line-height:1.02;letter-spacing:0;margin:14px 0 0;max-width:15em}
+.sec-head h2 .dim{display:block;color:var(--faint)}
+.sec-head .aside{color:var(--muted);max-width:26em;margin:0}
+
+/* CRT */
+.crt{background:var(--bezel);border-radius:10px;padding:22px;position:relative;box-shadow:inset 3px 3px 0 var(--bezel-hi),inset -4px -4px 0 var(--bezel-dk),0 24px 60px rgba(0,0,0,.35)}
+.crt::before{content:"";position:absolute;inset:7px;border-radius:6px;pointer-events:none;background-image:radial-gradient(circle,var(--bezel-dk) 1.6px,transparent 2.2px);background-size:15px 15px;opacity:.8}
+.crt .glass{position:relative;background:var(--screen);border-radius:5px;color:var(--scr-ink);overflow:hidden;box-shadow:inset 0 0 0 3px #1c1a14,inset 0 0 40px rgba(46,230,240,.06)}
+.crt .glass::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.35) 0 1px,transparent 1px 3px)}
+.crt .pled{position:absolute;right:26px;bottom:6px;width:18px;height:7px;background:#4BF05A;border:1px solid #1c1a14;box-shadow:0 0 8px #4BF05A}
+.scr{padding:20px 22px;font-family:var(--px);font-size:20px;line-height:1.25}
+.scr .hdr{display:flex;justify-content:space-between;gap:12px;color:var(--scr-dim);border-bottom:1px dashed var(--scr-line);padding-bottom:8px}
+.srb{background:var(--scr-rainbow);-webkit-background-clip:text;background-clip:text;color:transparent}
+.empty{display:grid;place-items:center;min-height:300px;text-align:center;color:var(--scr-dim)}
+.empty .big{font-size:30px}
+@media (max-width:560px){.crt{padding:12px}.crt::before{inset:3px}.scr{padding:14px}}
+
+/* transfer visual */
+.xfer{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start}
+@media (max-width:920px){.xfer{grid-template-columns:1fr}}
+.panel{border:1px solid var(--line2);border-radius:4px;background:var(--panel);padding:22px}
+.field{margin-bottom:18px}
+.field label,.flabel{display:block;font-size:14px;color:var(--muted);margin-bottom:7px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.inp{width:100%;background:transparent;border:1px solid var(--line2);border-radius:3px;padding:11px 12px;font-size:17px}
+.inp:focus{border-color:var(--acc);outline:none}
+select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:30px}
+select.inp option{background:var(--panel);color:var(--ink)}
+.panel .bz.full{width:100%;justify-content:center;padding:13px}
+.lanes{display:grid;grid-template-columns:1fr 1.3fr 1fr;align-items:center;gap:10px;margin-top:18px}
+.node{border:2px solid var(--scr-dim);padding:12px;text-align:center;min-height:118px;display:flex;flex-direction:column;justify-content:center}
+.node .nm{font-size:24px}
+.node .dl{font-size:26px;margin-top:6px}
+.node .lb{color:var(--scr-dim);font-size:17px}
+.wire{position:relative;height:24px}
+.wire::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed var(--scr-line)}
+.packet{position:absolute;top:50%;left:0;width:16px;height:16px;margin-top:-8px;background:var(--scr-rainbow);box-shadow:0 0 12px rgba(46,230,240,.6);opacity:0}
+.packet.go{animation:fly 1.4s steps(14) forwards}
+@keyframes fly{0%{left:0;opacity:1}100%{left:calc(100% - 16px);opacity:1}}
+.wire .wl{position:absolute;top:calc(50% + 14px);left:0;right:0;text-align:center;color:var(--scr-dim);font-size:16px}
+.log{margin-top:22px;border-top:1px dashed var(--scr-line);padding-top:10px}
+.log div{display:grid;grid-template-columns:34px 1fr;gap:8px;padding:3px 0;color:var(--scr-dim)}
+.log div.on{color:var(--scr-ink)}
+.log div.on b{color:var(--s4)}
+.log b{font-weight:400}
+.sup{display:flex;justify-content:space-between;gap:12px;margin-top:12px;border:1px solid var(--scr-line);padding:8px 12px}
+.sup b{font-weight:400;color:var(--s4);text-align:right}
+@media (max-width:560px){.lanes{grid-template-columns:1fr 1fr;row-gap:4px}.lanes .wire{grid-column:1/-1;grid-row:2;height:44px}.lanes .wire .wl{top:calc(50% + 10px)}#nTo{grid-row:1;grid-column:2}.node{min-height:100px}}
+
+/* factory */
+.market{display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start}
+@media (max-width:1020px){.market{grid-template-columns:1fr}}
+.tscroll{overflow-x:auto;border:1px solid var(--line2);border-radius:4px}
+table.lb{width:100%;border-collapse:collapse;min-width:760px;font-size:15px}
+.lb th{font-weight:400;color:var(--faint);text-align:right;padding:12px 14px;border-bottom:1px solid var(--line2);font-size:14px;white-space:nowrap}
+.lb th:nth-child(-n+3){text-align:left}
+.lb td{padding:13px 14px;border-bottom:1px solid var(--line)}
+.lb td.emptyrow{text-align:center;color:var(--muted);padding:56px 14px}
+.lb td.emptyrow a{color:var(--acc)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line2);border-left:1px solid var(--line)}
+.step{padding:28px 26px 34px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.step .num{font-family:var(--px);font-size:20px}
+.step h3{font-weight:500;font-size:23px;margin:12px 0 10px;letter-spacing:0}
+.step p{color:var(--muted);margin:0;font-size:16px}
+@media (max-width:860px){.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.steps{grid-template-columns:1fr}}
+
+/* launch */
+.launch{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+@media (max-width:920px){.launch{grid-template-columns:1fr}}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ck{display:flex;align-items:center;gap:10px;border:1px solid var(--line2);border-radius:3px;padding:9px 11px;cursor:pointer;font-size:16px}
+.ck input{accent-color:var(--acc);width:16px;height:16px;margin:0}
+.field .ck{display:flex;font-size:16px;margin:0;color:var(--ink)}
+.field .ck.dis{color:var(--faint);cursor:not-allowed}
+.ck small{margin-left:auto;font-family:var(--px);font-size:16px;color:var(--faint)}
+.sigbox{margin-top:14px;font-family:var(--px);font-size:17px;word-break:break-all;color:var(--muted);display:none;border-left:2px solid var(--acc);padding-left:12px}
+.sigbox.show{display:block}
+.pv .coin{display:flex;align-items:center;gap:16px;margin-top:16px}
+.pv .glyph{width:64px;height:64px;border:2px solid var(--s5);display:grid;place-items:center;font-size:26px;color:var(--s5);box-shadow:0 0 14px rgba(46,230,240,.35),inset 0 0 10px rgba(46,230,240,.2)}
+.pv .tk{font-size:42px;line-height:1;word-break:break-all}
+.pv .rows{margin-top:16px;border-top:1px dashed var(--scr-line);padding-top:10px}
+.pv .row{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
+.pv .row span:first-child{color:var(--scr-dim)}
+.pv .cl{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pv .cl span{border:1px solid currentColor;padding:1px 8px;font-size:18px}
+
+/* flywheel */
+.fly{display:grid;grid-template-columns:1fr 1.1fr;gap:48px;align-items:center}
+@media (max-width:920px){.fly{grid-template-columns:1fr}}
+.fly svg{width:100%;max-width:560px;margin:0 auto;display:block;overflow:visible}
+.fly .ring{fill:none;stroke-width:2;stroke-dasharray:3 6}
+.fly .nd{fill:var(--bg);stroke-width:2}
+.fly svg text{fill:var(--ink);font-family:var(--sans);font-size:15px}
+.fly svg .nn{font-family:var(--px);font-size:17px}
+.fly svg .ctr{font-family:var(--px);font-size:44px}
+.fly svg .ctr2{fill:var(--muted);font-size:14px}
+.fly p{color:var(--muted)}
+.rev{list-style:none;padding:0;margin:20px 0 0}
+.rev li{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}
+.rev li span:last-child{color:var(--muted);text-align:right;font-size:15px}
+
+.big-quote{font-size:clamp(28px,3.8vw,48px);line-height:1.12;letter-spacing:0;font-weight:500;margin:20px 0 28px;max-width:20em}
+.big-quote .dim{color:var(--faint)}
+.lede{color:var(--muted);max-width:40em;font-size:18px;margin:0 0 48px}
+.vs{display:grid;grid-template-columns:200px 1fr 1fr;border-top:1px solid var(--line2)}
+.vs > div{padding:16px 14px;border-bottom:1px solid var(--line)}
+.vs .h{color:var(--faint);font-size:14px}
+.vs .h.o{color:var(--acc)}
+.vs .rl{color:var(--muted)}
+.vs .ov{color:var(--ink)}
+.vs .wv{color:var(--muted)}
+@media (max-width:700px){.vs{grid-template-columns:1fr 1fr}.vs .rl{grid-column:1/-1;padding-bottom:0;border-bottom:0;font-size:14px;color:var(--faint)}.vs .h:first-child{display:none}}
+
+.road{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line2)}
+.road > div{padding:24px 24px 28px 0;border-right:1px solid var(--line);margin-right:24px}
+.road > div:last-child{border-right:0;margin-right:0}
+.road .ph{font-family:var(--px);font-size:20px;color:var(--faint)}
+.road .ph.now{color:var(--c4)}
+.road h3{font-weight:500;font-size:22px;margin:10px 0 8px}
+.road p{color:var(--muted);margin:0;font-size:16px}
+@media (max-width:760px){.road{grid-template-columns:1fr}.road>div{border-right:0;margin-right:0;border-bottom:1px solid var(--line)}}
+
+.close{text-align:center;padding:130px 0 120px;border-top:1px solid var(--line)}
+.close h2{font-weight:500;font-size:clamp(36px,5.6vw,80px);line-height:1.02;letter-spacing:0;margin:18px auto 0;max-width:14em}
+.close h2 .dim{color:var(--faint)}
+footer{border-top:1px solid var(--line);padding:28px 0 36px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+footer p{margin:0;color:var(--faint);font-size:14px;max-width:46em}
+
+.modal{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal .crt{width:100%;max-width:440px}
+.modal h3{margin:0 0 4px;font-weight:400;font-size:30px}
+.modal .sub{color:var(--scr-dim);margin:12px 0 8px}
+.wopt{display:flex;justify-content:space-between;align-items:center;width:100%;appearance:none;background:none;border:1px solid var(--scr-line);color:var(--scr-ink);padding:11px 14px;margin-bottom:8px;cursor:pointer;font-family:var(--px);font-size:22px;border-radius:2px;text-decoration:none}
+.wopt:hover{border-color:var(--s5);color:var(--s5)}
+.wopt small{font-size:17px;color:var(--scr-dim)}
+.wopt.det small{color:var(--s4)}
+.merr{color:var(--s1);min-height:1.2em;margin-top:6px}
+.mclose{position:absolute;top:30px;right:32px;z-index:2;background:none;border:0;color:var(--scr-dim);font-family:var(--px);font-size:22px;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:95;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:3px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="OFT home"><img src="mark.png" alt="">OFT<span class="cursor" aria-hidden="true"></span></a>
+    <nav class="links" aria-label="Sections">
+      <a href="#transfer">Transfers</a>
+      <a href="#factory">Token factory</a>
+      <a href="#launch">Launch</a>
+      <a href="#flywheel">$OFT</a>
+    </nav>
+    <div class="status"><span class="leds"><i style="background:var(--c1)"></i><i style="background:var(--c3)"></i><i style="background:var(--c4)"></i><i style="background:var(--c5)"></i><i style="background:var(--c7)"></i></span>LAYERZERO / OFT</div>
+    <a class="xlink" href="https://x.com/OFTpad" target="_blank" rel="noopener noreferrer" aria-label="OFT on X" title="@OFTpad on X"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+    <div class="wallet-wrap">
+      <button class="bz" id="walletBtn" aria-haspopup="true"><span class="pwr"></span><span id="walletLabel">Connect wallet</span></button>
+      <div class="wmenu" id="wmenu" role="menu">
+        <div class="tag">Connected with <span id="wname"></span></div>
+        <div class="addr" id="waddr"></div>
+        <div class="bal" id="wbal">Checking balance…</div>
+        <button id="wcopy" role="menuitem">Copy address</button>
+        <button id="wdisc" role="menuitem">Disconnect</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-meta"><span class="tag">Omnichain token launchpad</span><span class="tag">Est. 2026</span></div>
+    <div class="eyebrow"><span class="tag tag-line">One token. Every chain.</span></div>
+    <h1>Launch a coin.<span class="l2 rb">Go omnichain.</span></h1>
+    <div class="hero-grid">
+      <div class="side">
+        <div class="k" style="color:var(--c4)">[ SUPPLY: UNIFIED ]</div>
+        No wrapped copies.<br>No split supply.
+        <div class="rule"></div>
+      </div>
+      <figure class="mon">
+        <div class="crt">
+          <div class="glass" id="globeBox" role="img" aria-label="Interactive 3D globe linking Solana, Ethereum, Base, Arbitrum and BNB Chain. Drag to spin it, and pick two chains to send a token between them.">
+            <canvas id="glg" aria-hidden="true"></canvas>
+            <canvas id="gl"></canvas>
+            <div class="glabels" id="glabels" aria-hidden="true"></div>
+            <div class="hud top"><span>OFT / OMNICHAIN</span><span id="ghint">Drag to spin · tap two chains</span></div>
+            <div class="hud bot"><span id="gevent">5 CHAINS LINKED</span><span class="sup2">SUPPLY: UNIFIED</span></div>
+          </div>
+          <span class="pled"></span>
+        </div>
+        <div class="neck"></div><div class="base"></div>
+        <figcaption class="tag">Fig. 001 — one supply, many chains</figcaption>
+      </figure>
+      <div class="side r">
+        <div class="k" style="color:var(--c5)">debit → message → credit</div>
+        Leaves one chain.<br>Arrives on the next.
+        <div class="rule"></div>
+      </div>
+    </div>
+    <div class="hero-sub">
+      <p>Launch on 100 chains as easily as a memecoin on one.</p>
+      <p>Create one token with one coordinated supply across Solana, Ethereum, Base and more, built on LayerZero's OFT standard.</p>
+    </div>
+    <div class="cta">
+      <a class="bz" href="#launch"><span class="pwr"></span>Launch an omnichain coin</a>
+      <a class="ghost" href="#transfer">See how transfers work</a>
+    </div>
+    <div class="chainstrip" role="group" aria-label="Pick chains to send between on the globe">
+      <button class="chip" data-i="0" aria-pressed="false"><i style="background:var(--c7)"></i>Solana</button>
+      <button class="chip" data-i="1" aria-pressed="false"><i style="background:var(--c6)"></i>Ethereum</button>
+      <button class="chip" data-i="2" aria-pressed="false"><i style="background:var(--c5)"></i>Base</button>
+      <button class="chip soon" data-i="3" aria-pressed="false"><i style="background:var(--c4)"></i>Arbitrum · soon</button>
+      <button class="chip soon" data-i="4" aria-pressed="false"><i style="background:var(--c3)"></i>BNB Chain · soon</button>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="transfer">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="tag tag-line">How a transfer moves</span>
+        <h2>Debited here.<span class="dim">Credited there.</span></h2></div>
+      <p class="aside">An OFT transfer never copies a token. It removes it from the source chain, sends a LayerZero message, and adds it on the destination. Total supply never changes.</p>
+    </div>
+    <div class="xfer">
+      <div class="panel">
+        <div class="two">
+          <div class="field"><label for="xfrom">From</label><select class="inp" id="xfrom"></select></div>
+          <div class="field"><label for="xto">To</label><select class="inp" id="xto"></select></div>
+        </div>
+        <div class="field"><label for="xamt">Amount</label><input class="inp" id="xamt" type="number" min="1" step="any" placeholder="Amount" inputmode="decimal"></div>
+        <button class="bz full" id="xgo"><span class="pwr"></span>Trace the transfer</button>
+      </div>
+      <div class="crt">
+        <div class="glass"><div class="scr">
+          <div class="hdr"><span>OFT / SEND</span><span id="xstate">READY</span></div>
+          <div class="lanes">
+            <div class="node" id="nFrom"><div class="nm" id="nFromName">Solana</div><div class="dl" id="nFromDl">—</div><div class="lb">source</div></div>
+            <div class="wire"><span class="packet" id="packet"></span><span class="wl">LayerZero message</span></div>
+            <div class="node" id="nTo"><div class="nm" id="nToName">Base</div><div class="dl" id="nToDl">—</div><div class="lb">destination</div></div>
+          </div>
+          <div class="log" id="log">
+            <div data-s="1"><b>01</b><span>Debit the amount on the source chain</span></div>
+            <div data-s="2"><b>02</b><span>Send a LayerZero message to the destination</span></div>
+            <div data-s="3"><b>03</b><span>Verifiers confirm the message is authentic</span></div>
+            <div data-s="4"><b>04</b><span>Credit the same amount on the destination</span></div>
+          </div>
+          <div class="sup"><span>Total supply</span><b id="supLabel">unchanged</b></div>
+        </div></div>
+        <span class="pled"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="factory">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="tag tag-line">Omnichain token factory</span>
+        <h2>Every token, on every chain,<span class="dim">in public.</span></h2></div>
+      <p class="aside">Each token gets a dashboard with total supply, chain-by-chain distribution, transfer volume, supported networks and cross-chain activity.</p>
+    </div>
+    <div class="market">
+      <div class="tscroll">
+        <table class="lb">
+          <thead><tr><th scope="col">#</th><th scope="col">Token</th><th scope="col">Home chain</th><th scope="col">Total supply</th><th scope="col">Chains</th><th scope="col">Transfer volume</th><th scope="col">Transfers</th></tr></thead>
+          <tbody><tr><td colspan="7" class="emptyrow">No tokens yet. <a href="#launch">Launch the first one</a>.</td></tr></tbody>
+        </table>
+      </div>
+      <div class="crt">
+        <div class="glass"><div class="scr">
+          <div class="hdr"><span>TOKEN DASHBOARD</span><span>—</span></div>
+          <div class="empty"><div><div class="big srb">&gt; 0 tokens live_</div><div>Dashboards appear here once tokens launch.</div></div></div>
+        </div></div>
+        <span class="pled"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="tag tag-line">How it works</span>
+        <h2>From one chain to every chain<span class="dim">in six steps.</span></h2></div>
+      <p class="aside">Each step builds on the one before it.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="num" style="color:var(--c1)">01</div><h3>Launch a coin</h3><p>Create an OFT-compatible token with one unified supply across chains.</p></div>
+      <div class="step"><div class="num" style="color:var(--c2)">02</div><h3>Choose your chains</h3><p>Deploy across Ethereum, Solana, Base, Arbitrum, BNB Chain and other supported networks.</p></div>
+      <div class="step"><div class="num" style="color:var(--c3)">03</div><h3>Move tokens</h3><p>Holders transfer between chains through LayerZero messaging and OFT debit and credit.</p></div>
+      <div class="step"><div class="num" style="color:var(--c4)">04</div><h3>Unified supply</h3><p>Tokens are debited on the source chain and credited on the destination, so total supply holds.</p></div>
+      <div class="step"><div class="num" style="color:var(--c5)">05</div><h3>Cross-chain expansion</h3><p>Add new networks later without building a separate wrapped-token ecosystem for each one.</p></div>
+      <div class="step"><div class="num" style="color:var(--c7)">06</div><h3>Token buybacks</h3><p>A share of realized net protocol revenue funds $OFT buybacks.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="launch">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="tag tag-line">Launchpad</span>
+        <h2>Launch a coin.<span class="dim">Pick its chains.</span></h2></div>
+      <p class="aside">Set a name, ticker, supply and home chain, then choose where it lives. Your token takes shape on the right as you go.</p>
+    </div>
+    <div class="launch">
+      <form class="panel" id="lform" novalidate>
+        <div class="two">
+          <div class="field"><label for="lname">Coin name</label><input class="inp" id="lname" placeholder="Coin name" maxlength="32" autocomplete="off"></div>
+          <div class="field"><label for="ltk">Ticker</label><input class="inp" id="ltk" placeholder="TICKER" maxlength="10" autocomplete="off" style="text-transform:uppercase"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label for="lsup">Total supply</label><input class="inp" id="lsup" placeholder="Total supply" inputmode="numeric" autocomplete="off"></div>
+          <div class="field"><label for="lhome">Home chain</label><select class="inp" id="lhome"></select></div>
+        </div>
+        <div class="field">
+          <span class="flabel">Chains</span>
+          <div class="checks" id="lchains"></div>
+        </div>
+        <button class="bz full" type="submit" id="lbtn"><span class="pwr"></span><span id="lbtnLabel">Connect wallet to launch</span></button>
+        <div class="sigbox" id="sigbox" aria-live="polite"></div>
+      </form>
+      <div class="crt pv">
+        <div class="glass"><div class="scr">
+          <div class="hdr"><span>YOUR TOKEN</span><span>OFT</span></div>
+          <div class="coin">
+            <div class="glyph" id="pvGlyph">?</div>
+            <div><div class="tk srb" id="pvTk">$TICKER</div><div id="pvName" style="color:var(--scr-dim)">Unnamed token</div></div>
+          </div>
+          <div class="rows">
+            <div class="row"><span>Total supply</span><span id="pvSup">—</span></div>
+            <div class="row"><span>Home chain</span><span id="pvHome">Solana</span></div>
+            <div class="row"><span>Chains</span><span id="pvCount">3</span></div>
+          </div>
+          <div class="cl" id="pvChains"></div>
+          <div style="margin-top:14px;color:var(--scr-dim)">One supply, shared across every chain above.</div>
+        </div></div>
+        <span class="pled"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="flywheel">
+  <div class="wrap">
+    <div class="fly">
+      <div>
+        <span class="tag tag-line">$OFT token flywheel</span>
+        <div class="sec-head" style="margin-bottom:20px"><h2>More chains.<span class="dim">More transfers. Repeat.</span></h2></div>
+        <p>Each new omnichain token brings more chains and users. More users move more tokens across chains, transfers pay protocol fees, and fees fund $OFT buybacks. That draws in more developers, who launch more tokens.</p>
+        <h3 style="font-weight:500;font-size:20px;margin:36px 0 0">Where revenue comes from</h3>
+        <ul class="rev">
+          <li><span>Token deployment fees</span><span>Paid once per launch</span></li>
+          <li><span>Cross-chain transfer fees</span><span>A small service fee per transfer</span></li>
+          <li><span>Premium omnichain infrastructure</span><span>Faster, managed cross-chain setup</span></li>
+          <li><span>Enterprise integrations</span><span>For teams going multichain at scale</span></li>
+          <li><span>$OFT buybacks</span><span>Funded from net protocol revenue</span></li>
+        </ul>
+      </div>
+      <svg viewBox="-80 -20 560 440" role="img" aria-label="Flywheel: more omnichain tokens launched, more supported chains and users, more cross-chain transfers, more protocol fee revenue, more $OFT buybacks, more developers and token launches, then repeat.">
+        <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--c1)"/><stop offset=".33" style="stop-color:var(--c3)"/><stop offset=".55" style="stop-color:var(--c4)"/><stop offset=".75" style="stop-color:var(--c5)"/><stop offset="1" style="stop-color:var(--c7)"/></linearGradient></defs>
+        <path id="ringPath" class="ring" stroke="url(#rg)" d="M200,40 a160,160 0 1,1 -0.01,0"/>
+        <g id="nodes"></g>
+        <text class="ctr" x="200" y="208" text-anchor="middle" style="fill:var(--c5)">$OFT</text>
+        <text class="ctr2" x="200" y="232" text-anchor="middle">the cycle repeats ↻</text>
+        <rect width="12" height="12" x="-6" y="-6" style="fill:var(--c4)" id="flyDot"><animateMotion dur="9s" repeatCount="indefinite"><mpath href="#ringPath"/></animateMotion></rect>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="different">
+  <div class="wrap">
+    <span class="tag tag-line">What makes it different</span>
+    <p class="big-quote">Pump.fun democratized token creation.<span class="dim"> OFT democratizes omnichain token deployment.</span></p>
+    <p class="lede">Instead of launching on one chain and struggling to expand, creators build multichain assets from day one.</p>
+    <div class="vs" role="table" aria-label="OFT compared with a wrapped-token bridge">
+      <div class="h" role="columnheader"></div><div class="h o" role="columnheader">OFT</div><div class="h" role="columnheader">Wrapped-token bridge</div>
+      <div class="rl" role="rowheader">What arrives</div><div class="ov">The same token, native on the new chain</div><div class="wv">A wrapped copy backed by a locked original</div>
+      <div class="rl" role="rowheader">Supply</div><div class="ov">One total, coordinated across chains</div><div class="wv">Split between originals and wrappers</div>
+      <div class="rl" role="rowheader">Adding a chain</div><div class="ov">Connect it to the same token</div><div class="wv">A new wrapper and a new ecosystem</div>
+      <div class="rl" role="rowheader">For holders</div><div class="ov">One ticker everywhere</div><div class="wv">Several look-alike tickers to tell apart</div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="roadmap">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="tag tag-line">Launch strategy</span><h2>Start with three chains.<span class="dim">Then a hundred.</span></h2></div>
+    </div>
+    <div class="road">
+      <div><div class="ph now">● Phase 1</div><h3>Solana, Base, Ethereum</h3><p>Launch on supported LayerZero endpoints with compatible OFT implementations.</p></div>
+      <div><div class="ph">○ Phase 2</div><h3>More EVM networks</h3><p>Arbitrum, BNB Chain and other EVM networks join the factory.</p></div>
+      <div><div class="ph">○ Phase 3</div><h3>Automated multichain deploys</h3><p>Tools that deploy and connect a token across many chains in one step.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="close">
+  <div class="wrap">
+    <span class="tag tag-line">Core vision</span>
+    <h2>Launch on 100 chains<span class="dim"> as easily as a memecoin on one.</span></h2>
+    <div class="cta" style="margin-top:40px">
+      <a class="bz" href="#launch"><span class="pwr"></span>Launch an omnichain coin</a>
+      <a class="ghost" href="#top">Back to the top ↑</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="tag rb">One token. Every chain.</span>
+    <p>Cross-chain transfers require gas and messaging fees. A unified supply does not unify liquidity or remove cross-chain security risk. Nothing on this page is financial advice.</p>
+  </div>
+</footer>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mtitle">
+  <div class="crt">
+    <button class="mclose" id="mclose" aria-label="Close">[x]</button>
+    <div class="glass"><div class="scr">
+      <h3 id="mtitle" class="srb">Connect wallet_</h3>
+      <div class="sub">Solana</div>
+      <div id="wlistSol"></div>
+      <div class="sub">EVM: Ethereum, Base, Arbitrum, BNB Chain</div>
+      <div id="wlistEvm"></div>
+      <div class="merr" id="merr" aria-live="polite"></div>
+    </div></div>
+    <span class="pled"></span>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt=(n,d=2)=>n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>el.classList.remove('show'),2200)}
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+function b58(bytes){const A='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';const d=[];
+  for(const b of bytes){let c=b;for(let j=0;j<d.length;j++){c+=d[j]<<8;d[j]=c%58;c=(c/58)|0}while(c){d.push(c%58);c=(c/58)|0}}
+  let s='';for(const b of bytes){if(b===0)s+='1';else break}for(let i=d.length-1;i>=0;i--)s+=A[d[i]];return s}
+
+const CHAINS=[
+  {id:'solana',name:'Solana',col:'--s7',live:true},
+  {id:'ethereum',name:'Ethereum',col:'--s6',live:true},
+  {id:'base',name:'Base',col:'--s5',live:true},
+  {id:'arbitrum',name:'Arbitrum',col:'--s4',live:false},
+  {id:'bnb',name:'BNB Chain',col:'--s3',live:false}
+];
+
+/* ---------- wallets: Solana SDK + EVM ---------- */
+const W3=window.solanaWeb3||null;
+const SOL=[
+  {id:'phantom',name:'Phantom',url:'https://phantom.app/',get:()=>(window.phantom&&window.phantom.solana&&window.phantom.solana.isPhantom)?window.phantom.solana:(window.solana&&window.solana.isPhantom?window.solana:null)},
+  {id:'solflare',name:'Solflare',url:'https://solflare.com/',get:()=>(window.solflare&&window.solflare.isSolflare)?window.solflare:null},
+  {id:'backpack',name:'Backpack',url:'https://backpack.app/',get:()=>(window.backpack&&window.backpack.isBackpack)?window.backpack:null}
+];
+const EVM=[{id:'evm',name:'MetaMask / EVM wallet',url:'https://metamask.io/',get:()=>window.ethereum||null}];
+const EVM_NET={'0x1':['Ethereum','ETH'],'0x2105':['Base','ETH'],'0xa4b1':['Arbitrum','ETH'],'0x38':['BNB Chain','BNB']};
+const wallet={kind:null,provider:null,meta:null,addr:null};
+const short=a=>a.slice(0,4)+'…'+a.slice(-4);
+function renderWallet(){
+  const btn=$('#walletBtn');
+  if(wallet.addr){btn.classList.add('on');$('#walletLabel').textContent=short(wallet.addr);$('#waddr').textContent=wallet.addr;$('#wname').textContent=wallet.meta.name;$('#lbtnLabel').textContent='Sign launch request'}
+  else{btn.classList.remove('on');$('#walletLabel').textContent='Connect wallet';$('#wmenu').classList.remove('open');$('#lbtnLabel').textContent='Connect wallet to launch'}
+}
+async function loadBalance(){
+  const el=$('#wbal');el.textContent='Checking balance…';
+  try{
+    if(wallet.kind==='sol'){
+      if(!W3)throw 0;
+      const conn=new W3.Connection(W3.clusterApiUrl('mainnet-beta'),'confirmed');
+      const lam=await Promise.race([conn.getBalance(new W3.PublicKey(wallet.addr)),new Promise((_,r)=>setTimeout(()=>r(0),6000))]);
+      el.textContent=fmt(lam/W3.LAMPORTS_PER_SOL,4)+' SOL · Solana';
+    }else{
+      const p=wallet.provider;
+      const [hex,cid]=await Promise.all([p.request({method:'eth_getBalance',params:[wallet.addr,'latest']}),p.request({method:'eth_chainId'})]);
+      const net=EVM_NET[cid]||['Chain '+parseInt(cid,16),'native'];
+      el.textContent=fmt(Number(BigInt(hex))/1e18,4)+' '+net[1]+' · '+net[0];
+    }
+  }catch(e){el.textContent='Balance unavailable right now.'}
+}
+function onDisconnect(){wallet.kind=wallet.provider=wallet.meta=wallet.addr=null;store.del('oft.wallet');renderWallet()}
+async function connectSol(meta,silent){
+  const p=meta.get();
+  if(!p){if(!silent)$('#merr').textContent=meta.name+' isn\u2019t installed in this browser.';return}
+  try{
+    const res=await p.connect(silent?{onlyIfTrusted:true}:undefined);
+    const raw=(res&&res.publicKey)||p.publicKey;if(!raw)throw new Error('No public key returned');
+    const a=W3?new W3.PublicKey(raw.toString()).toBase58():raw.toString();
+    Object.assign(wallet,{kind:'sol',provider:p,meta,addr:a});store.set('oft.wallet',meta.id);
+    if(p.on){try{p.on('disconnect',onDisconnect);p.on('accountChanged',pk=>{if(pk){wallet.addr=pk.toString();renderWallet();loadBalance()}else onDisconnect()})}catch(e){}}
+    done(silent);
+  }catch(e){if(!silent)$('#merr').textContent=(e&&e.code===4001)?'Connection request was rejected in the wallet.':'Couldn\u2019t connect: '+((e&&e.message)||'unknown error')}
+}
+async function connectEvm(meta,silent){
+  const p=meta.get();
+  if(!p){if(!silent)$('#merr').textContent='No EVM wallet found in this browser.';return}
+  try{
+    const accs=await p.request({method:silent?'eth_accounts':'eth_requestAccounts'});
+    if(!accs||!accs.length){if(!silent)throw new Error('No account returned');return}
+    Object.assign(wallet,{kind:'evm',provider:p,meta,addr:accs[0]});store.set('oft.wallet','evm');
+    if(p.on){try{p.on('accountsChanged',a=>{if(a&&a.length){wallet.addr=a[0];renderWallet();loadBalance()}else onDisconnect()});p.on('chainChanged',()=>loadBalance())}catch(e){}}
+    done(silent);
+  }catch(e){if(!silent)$('#merr').textContent=(e&&e.code===4001)?'Connection request was rejected in the wallet.':'Couldn\u2019t connect: '+((e&&e.message)||'unknown error')}
+}
+function done(silent){renderWallet();closeModal();if(!silent)toast('Connected '+short(wallet.addr));loadBalance()}
+function opt(m,list,fn){
+  if(m.get()){const b=document.createElement('button');b.className='wopt det';b.innerHTML='<span>'+m.name+'</span><small>detected</small>';b.onclick=()=>fn(m,false);list.appendChild(b)}
+  else{const a=document.createElement('a');a.className='wopt';a.href=m.url;a.target='_blank';a.rel='noopener noreferrer';a.innerHTML='<span>'+m.name+'</span><small>install ↗</small>';list.appendChild(a)}
+}
+function openModal(){
+  const ls=$('#wlistSol'),le=$('#wlistEvm');ls.innerHTML='';le.innerHTML='';$('#merr').textContent='';
+  SOL.forEach(m=>opt(m,ls,connectSol));EVM.forEach(m=>opt(m,le,connectEvm));
+  if(![...SOL,...EVM].some(m=>m.get()))$('#merr').textContent='No wallet found. Install one, or open this page in a browser with your wallet extension enabled.';
+  $('#modal').classList.add('open');setTimeout(()=>{const f=$('#modal').querySelector('.wopt');if(f)f.focus()},30);
+}
+function closeModal(){$('#modal').classList.remove('open')}
+$('#mclose').onclick=closeModal;
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();$('#wmenu').classList.remove('open')}});
+$('#walletBtn').onclick=e=>{e.stopPropagation();if(wallet.addr)$('#wmenu').classList.toggle('open');else openModal()};
+document.addEventListener('click',e=>{if(!e.target.closest('.wallet-wrap'))$('#wmenu').classList.remove('open')});
+$('#wcopy').onclick=async()=>{try{await navigator.clipboard.writeText(wallet.addr);toast('Address copied')}catch(e){toast('Copy failed. Select the address instead.')}};
+$('#wdisc').onclick=async()=>{try{if(wallet.kind==='sol'&&wallet.provider.disconnect)await wallet.provider.disconnect()}catch(e){}onDisconnect();toast('Wallet disconnected')};
+window.addEventListener('load',()=>{const id=store.get('oft.wallet');if(!id)return;
+  setTimeout(()=>{if(id==='evm')connectEvm(EVM[0],true);else{const m=SOL.find(w=>w.id===id);if(m)connectSol(m,true)}},400)});
+
+/* ---------- transfer trace ---------- */
+const opts=sel=>CHAINS.map(c=>`<option value="${c.id}">${c.name}${c.live?'':' (soon)'}</option>`).join('');
+$('#xfrom').innerHTML=opts();$('#xto').innerHTML=opts();$('#xto').value='base';
+const chain=id=>CHAINS.find(c=>c.id===id);
+function setNodes(){
+  const f=chain($('#xfrom').value),t=chain($('#xto').value);
+  $('#nFromName').textContent=f.name;$('#nToName').textContent=t.name;
+  $('#nFrom').style.borderColor=`var(${f.col})`;$('#nTo').style.borderColor=`var(${t.col})`;
+  $('#nFromName').style.color=`var(${f.col})`;$('#nToName').style.color=`var(${t.col})`;
+}
+['xfrom','xto'].forEach(id=>$('#'+id).addEventListener('change',setNodes));setNodes();
+let xt=[];
+$('#xgo').onclick=()=>{
+  const amt=parseFloat($('#xamt').value);
+  if(!(amt>0)){toast('Enter an amount above 0');$('#xamt').focus();return}
+  if($('#xfrom').value===$('#xto').value){toast('Pick two different chains');return}
+  xt.forEach(clearTimeout);xt=[];
+  const a=amt.toLocaleString('en-US',{maximumFractionDigits:6});
+  const steps=[...document.querySelectorAll('#log div')];steps.forEach(s=>s.classList.remove('on'));
+  $('#nFromDl').textContent='—';$('#nToDl').textContent='—';$('#nFromDl').style.color='';$('#nToDl').style.color='';
+  const pk=$('#packet');pk.classList.remove('go');void pk.offsetWidth;
+  const k=reduce?0:1;
+  $('#xstate').textContent='SENDING';
+  xt.push(setTimeout(()=>{steps[0].classList.add('on');$('#nFromDl').textContent='−'+a;$('#nFromDl').style.color='var(--s1)'},150*k));
+  xt.push(setTimeout(()=>{steps[1].classList.add('on');if(!reduce)pk.classList.add('go')},600*k));
+  xt.push(setTimeout(()=>{steps[2].classList.add('on')},1400*k));
+  xt.push(setTimeout(()=>{steps[3].classList.add('on');$('#nToDl').textContent='+'+a;$('#nToDl').style.color='var(--s4)';$('#xstate').textContent='DELIVERED';$('#supLabel').textContent='unchanged (−'+a+' +'+a+')'},2100*k));
+};
+
+/* ---------- launch ---------- */
+$('#lhome').innerHTML=CHAINS.filter(c=>c.live).map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+$('#lchains').innerHTML=CHAINS.map(c=>c.live
+  ?`<label class="ck"><input type="checkbox" value="${c.id}" checked><span>${c.name}</span></label>`
+  :`<label class="ck dis"><input type="checkbox" value="${c.id}" disabled><span>${c.name}</span><small>soon</small></label>`).join('');
+const supNum=()=>{const n=Number(($('#lsup').value||'').replace(/[^0-9]/g,''));return n>0?n:0};
+function lp(){
+  const tk=($('#ltk').value||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,10)||'TICKER';
+  const name=$('#lname').value.trim()||'Unnamed token';
+  const home=$('#lhome').value;
+  const boxes=[...document.querySelectorAll('#lchains input')];
+  boxes.forEach(b=>{if(b.value===home){b.checked=true;b.disabled=true}else if(chain(b.value).live)b.disabled=false});
+  const sel=boxes.filter(b=>b.checked).map(b=>chain(b.value));
+  const sup=supNum();
+  $('#pvTk').textContent='$'+tk;$('#pvGlyph').textContent=tk==='TICKER'?'?':tk[0];$('#pvName').textContent=name;
+  $('#pvSup').textContent=sup?sup.toLocaleString('en-US'):'—';$('#pvHome').textContent=chain(home).name;$('#pvCount').textContent=sel.length;
+  $('#pvChains').innerHTML=sel.map(c=>`<span style="color:var(${c.col})">${c.name}</span>`).join('');
+  return {tk,name,home:chain(home).name,sel:sel.map(c=>c.name),sup};
+}
+$('#lsup').addEventListener('blur',()=>{const n=supNum();$('#lsup').value=n?n.toLocaleString('en-US'):''});
+['lname','ltk','lsup','lhome'].forEach(id=>$('#'+id).addEventListener('input',lp));
+$('#lchains').addEventListener('change',lp);
+lp();
+$('#lform').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const box=$('#sigbox');
+  if(!wallet.addr){openModal();return}
+  const c=lp();
+  if(!$('#lname').value.trim()||!$('#ltk').value.trim()||!c.sup){box.className='sigbox show';box.textContent='Add a coin name, ticker and total supply first.';return}
+  const msg=`OFT launch request\nCoin: ${c.name} ($${c.tk})\nTotal supply: ${c.sup.toLocaleString('en-US')}\nHome chain: ${c.home}\nChains: ${c.sel.join(', ')}\nWallet: ${wallet.addr}\nIssued: ${new Date().toISOString()}`;
+  try{
+    $('#lbtn').disabled=true;$('#lbtnLabel').textContent='Waiting for wallet…';
+    let sig;
+    if(wallet.kind==='sol'){
+      const p=wallet.provider;
+      if(!p.signMessage)throw new Error(wallet.meta.name+' doesn\u2019t support message signing');
+      const r=await p.signMessage(new TextEncoder().encode(msg),'utf8');
+      sig=b58(new Uint8Array(r&&r.signature?r.signature:r));
+    }else{
+      const hex='0x'+[...new TextEncoder().encode(msg)].map(b=>b.toString(16).padStart(2,'0')).join('');
+      sig=await wallet.provider.request({method:'personal_sign',params:[hex,wallet.addr]});
+    }
+    box.className='sigbox show';box.textContent='Signed. $'+c.tk+' is queued for launch on '+c.sel.length+' chains. Signature: '+sig;
+    toast('Launch request signed');
+  }catch(err){box.className='sigbox show';box.textContent=(err&&err.code===4001)?'Signature request was rejected in the wallet. Nothing was signed.':'Signing failed: '+((err&&err.message)||'unknown error')}
+  finally{$('#lbtn').disabled=false;renderWallet()}
+});
+
+/* ---------- 3D omnichain globe (pixel-rendered) ---------- */
+(function(){
+  const glass=$('#globeBox'),cv=$('#gl'),gv=$('#glg'),ctx=cv.getContext('2d'),gctx=gv.getContext('2d');
+  const labelsEl=$('#glabels'),hint=$('#ghint'),evt=$('#gevent');
+  let PX=3;const D=5.4,RO=1.75,TILT=0.32,TILTZ=-0.12;
+  const NODES=CHAINS.map((c,i)=>({c,i,hex:getComputedStyle(document.documentElement).getPropertyValue(c.col).trim()||'#fff'}));
+  let W=0,H=0,cx=0,cy=0,scale=0,Rg=0,rowCol=[];
+  let yaw=0.6,pitch=0.32,vYaw=reduce?0:0.0035,vPitch=0,phase=0;
+  let drag=null,hover=-1,sel=-1,lastUser=0,lastAuto=0,running=true;
+  const sends=[],marks=[],stars=[];
+  for(let i=0;i<70;i++)stars.push([Math.random(),Math.random(),Math.random()*6.28]);
+
+  // labels
+  NODES.forEach(n=>{const s=document.createElement('span');s.className='glab';s.textContent=n.c.name;s.style.color=`var(${n.c.col})`;labelsEl.appendChild(s);n.el=s});
+
+  function resize(){
+    const r=glass.getBoundingClientRect();PX=r.width<520?2:3;
+    W=Math.max(90,Math.round(r.width/PX));H=Math.max(70,Math.round(r.height/PX));
+    [cv,gv].forEach(c=>{c.width=W;c.height=H});
+    cx=W/2;cy=H/2+H*.03;scale=Math.min(W*.92,H*1.2)*1.12;Rg=scale/Math.sqrt(D*D-1);
+    rowCol=[];for(let y=0;y<H;y++){const t=Math.min(1,Math.max(0,(y-(cy-Rg*1.9))/(Rg*3.8)));rowCol.push(`hsl(${Math.round(20+t*285)},100%,${62-Math.round(6*Math.sin(t*3.14))}%)`)}
+  }
+  function rot(p){const [x,y,z]=p,cY=Math.cos(yaw),sY=Math.sin(yaw),x1=x*cY+z*sY,z1=-x*sY+z*cY,cP=Math.cos(pitch),sP=Math.sin(pitch);return [x1,y*cP-z1*sP,y*sP+z1*cP]}
+  function proj(w){const r=rot(w),k=scale/(D-r[2]);return {x:cx+r[0]*k,y:cy-r[1]*k,z:r[2],k}}
+  function ringPt(a,rad){let x=Math.cos(a)*rad,y=0,z=Math.sin(a)*rad;
+    const c=Math.cos(TILT),s=Math.sin(TILT);[y,z]=[y*c-z*s,y*s+z*c];
+    const c2=Math.cos(TILTZ),s2=Math.sin(TILTZ);[x,y]=[x*c2-y*s2,x*s2+y*c2];return [x,y,z]}
+  const nodeW=i=>ringPt(phase+i*2*Math.PI/NODES.length,RO);
+  const behind=p=>p.z<0&&Math.hypot(p.x-cx,p.y-cy)<Rg;
+
+  function px(x,y,col){x|=0;y|=0;if(x<0||y<0||x>=W||y>=H)return;ctx.fillStyle=col||rowCol[y];ctx.fillRect(x,y,1,1)}
+  function line(a,b,col,dash){let x0=Math.round(a.x),y0=Math.round(a.y);const x1=Math.round(b.x),y1=Math.round(b.y);
+    const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy,n=0;
+    for(;;){if(!dash||(n++%3)!==2)px(x0,y0,col);if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx}if(e2<=dx){e+=dx;y0+=sy}}}
+
+  // globe geometry
+  const G=[];
+  [-62,-34,-11,11,34,62].forEach(lat=>{const r=Math.cos(lat*Math.PI/180),y=Math.sin(lat*Math.PI/180),pts=[];for(let i=0;i<=48;i++){const a=i/48*6.283;pts.push([Math.cos(a)*r,y,Math.sin(a)*r])}G.push(pts)});
+  for(let m=0;m<6;m++){const a=m/6*Math.PI,pts=[];for(let i=0;i<=48;i++){const t=i/48*6.283;pts.push([Math.cos(a)*Math.cos(t),Math.sin(t),Math.sin(a)*Math.cos(t)])}G.push(pts)}
+  const RING=[];for(let i=0;i<=96;i++)RING.push(i/96*6.283);
+
+  function arcPt(s){const A=nodeW(s.a),B=nodeW(s.b);return t=>{const lift=Math.sin(Math.PI*t);
+    let m=[A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t+lift*.5,A[2]+(B[2]-A[2])*t];const L=Math.hypot(...m)||1,r=RO+lift*.28;return [m[0]/L*r,m[1]/L*r,m[2]/L*r]}}
+
+  function send(a,b,user){
+    if(a===b)return;sends.push({a,b,t:0});
+    marks.push({i:a,txt:'-',life:1});
+    evt.textContent=NODES[a].c.name.toUpperCase()+' → '+NODES[b].c.name.toUpperCase()+' · SENDING';
+    if(user)lastUser=performance.now();
+  }
+  function pick(i){
+    lastUser=performance.now();
+    if(sel<0){sel=i;hint.textContent='Now tap a destination';}
+    else if(sel===i){sel=-1;hint.textContent='Drag to spin · tap two chains';}
+    else{send(sel,i,true);sel=-1;hint.textContent='Drag to spin · tap two chains';}
+    document.querySelectorAll('.chip[data-i]').forEach(c=>c.setAttribute('aria-pressed',+c.dataset.i===sel));
+  }
+
+  function frame(now){
+    if(!running)return;
+    if(!drag){yaw+=vYaw;pitch+=vPitch;vPitch*=.92;if(Math.abs(vYaw)>0.0035&&!reduce)vYaw*=.97;else if(!reduce&&Math.abs(vYaw)<0.0035)vYaw+=(0.0035*Math.sign(vYaw||1)-vYaw)*.02}
+    pitch=Math.max(-.55,Math.min(.75,pitch));
+    if(!reduce)phase+=.0016;
+    ctx.clearRect(0,0,W,H);
+    // stars
+    stars.forEach(s=>{const tw=.5+.5*Math.sin(now/700+s[2]);if(tw>.35){ctx.fillStyle=`rgba(226,242,234,${(tw*.45).toFixed(2)})`;ctx.fillRect((s[0]*W)|0,(s[1]*H)|0,1,1)}});
+    // ring + nodes + arcs, split by depth
+    const back=[],front=[];
+    for(let i=0;i<RING.length-1;i++){const a=proj(ringPt(RING[i],RO)),b=proj(ringPt(RING[i+1],RO));((a.z+b.z)/2<0?back:front).push(()=>line(a,b,null,true))}
+    sends.forEach(s=>{const f=arcPt(s);let prev=proj(f(0));
+      for(let k=1;k<=24;k++){const t=k/24,p=proj(f(t));const seg=[prev,p];const lit=t<=s.t&&t>=s.t-.35;
+        ((prev.z+p.z)/2<0?back:front).push(()=>{if(lit)line(seg[0],seg[1]);else if(k%2)line(seg[0],seg[1],'rgba(226,242,234,.22)')});prev=p}
+      const h=proj(f(Math.min(1,s.t)));(h.z<0?back:front).push(()=>{ctx.fillStyle='#fff';ctx.fillRect((h.x|0)-1,(h.y|0)-1,3,3)})});
+    NODES.forEach(n=>{const p=proj(nodeW(n.i));n.p=p;const sz=Math.max(3,Math.round(p.k*.17))+(hover===n.i||sel===n.i?2:0);
+      (p.z<0?back:front).push(()=>{const x=Math.round(p.x-sz/2),y=Math.round(p.y-sz/2);ctx.fillStyle=n.hex;ctx.fillRect(x,y,sz,sz);ctx.fillStyle='#040B08';ctx.fillRect(x+1,y+1,sz-2,sz-2);
+        if(sel===n.i&&Math.floor(now/250)%2===0||hover===n.i){ctx.fillStyle=n.hex;ctx.fillRect(x+2,y+2,sz-4,sz-4)}else{ctx.fillStyle=n.hex;ctx.fillRect(Math.round(p.x)-0,Math.round(p.y)-0,1,1)}})});
+    back.forEach(f=>f());
+    // globe body (occludes what's behind it)
+    ctx.fillStyle='#040B08';ctx.beginPath();ctx.arc(cx,cy,Rg,0,6.283);ctx.fill();
+    G.forEach(pts=>{let prev=proj(pts[0]);for(let i=1;i<pts.length;i++){const p=proj(pts[i]);if(prev.z>=-.05&&p.z>=-.05)line(prev,p);prev=p}});
+    for(let i=0;i<64;i++){const a=i/64*6.283,b=(i+1)/64*6.283;line({x:cx+Math.cos(a)*Rg,y:cy+Math.sin(a)*Rg},{x:cx+Math.cos(b)*Rg,y:cy+Math.sin(b)*Rg})}
+    // OFT plate
+    const fs=Math.max(8,Math.round(Rg*.36));ctx.font=`${fs}px "Pixelify Sans","VT323",monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
+    const tw=ctx.measureText('OFT').width;ctx.fillStyle='#040B08';ctx.fillRect(Math.round(cx-tw/2-3),Math.round(cy-fs*.55),Math.round(tw+6),Math.round(fs*1.1));
+    const g=ctx.createLinearGradient(cx-tw/2,0,cx+tw/2,0);g.addColorStop(0,'#FFE53B');g.addColorStop(.5,'#4BF05A');g.addColorStop(1,'#2EE6F0');ctx.fillStyle=g;ctx.fillText('OFT',Math.round(cx),Math.round(cy+1));
+    front.forEach(f=>f());
+    // +/- marks
+    ctx.font=`${Math.max(8,Math.round(Rg*.3))}px "VT323",monospace`;
+    for(let i=marks.length-1;i>=0;i--){const m=marks[i];const p=NODES[m.i].p;m.life-=reduce?.05:.012;if(m.life<=0){marks.splice(i,1);continue}
+      ctx.globalAlpha=Math.min(1,m.life*1.5);ctx.fillStyle=m.txt==='+'?'#4BF05A':'#FF4040';ctx.fillText(m.txt==='+'?'+1':'−1',Math.round(p.x),Math.round(p.y-8-(1-m.life)*10));ctx.globalAlpha=1}
+    // advance sends
+    for(let i=sends.length-1;i>=0;i--){const s=sends[i];s.t+=reduce?.06:.0105;if(s.t>=1.35){sends.splice(i,1)}else if(s.t>=1&&!s.done){s.done=1;marks.push({i:s.b,txt:'+',life:1});evt.textContent=NODES[s.a].c.name.toUpperCase()+' → '+NODES[s.b].c.name.toUpperCase()+' · DELIVERED'}}
+    // labels
+    NODES.forEach(n=>{const p=n.p,hid=behind(p);const lx=Math.max(n.el.offsetWidth/2+6,Math.min(W*PX-n.el.offsetWidth/2-6,p.x*PX));n.el.style.transform=`translate(${Math.round(lx)}px,${Math.round(p.y*PX-p.k*.17*PX-18)}px) translateX(-50%)`;n.el.style.opacity=hid?0:(p.z<0?.5:1)});
+    gctx.clearRect(0,0,W,H);gctx.drawImage(cv,0,0);
+    requestAnimationFrame(frame);
+  }
+  function at(e){const r=cv.getBoundingClientRect();return [(e.clientX-r.left)/PX,(e.clientY-r.top)/PX]}
+  function hit(x,y){let best=-1,bd=1e9;NODES.forEach(n=>{if(!n.p||behind(n.p))return;const d=Math.hypot(n.p.x-x,n.p.y-y);if(d<Math.max(7,n.p.k*.22)&&d<bd){bd=d;best=n.i}});return best}
+  cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,moved:0};lastUser=performance.now();cv.setPointerCapture(e.pointerId)});
+  cv.addEventListener('pointermove',e=>{
+    if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.moved+=Math.abs(dx)+Math.abs(dy);drag.x=e.clientX;drag.y=e.clientY;yaw+=dx*.008;pitch+=dy*.006;vYaw=dx*.0012;vPitch=dy*.0008;lastUser=performance.now()}
+    const [x,y]=at(e);hover=hit(x,y);cv.style.cursor=hover>=0?'pointer':(drag?'grabbing':'grab')});
+  cv.addEventListener('pointerup',e=>{if(drag&&drag.moved<6){const [x,y]=at(e);const h=hit(x,y);if(h>=0)pick(h)}drag=null});
+  cv.addEventListener('pointerleave',()=>{hover=-1});
+  document.querySelectorAll('.chip[data-i]').forEach(c=>c.addEventListener('click',()=>pick(+c.dataset.i)));
+  new ResizeObserver(resize).observe(glass);resize();
+  const io=new IntersectionObserver(es=>{const v=es[0].isIntersecting;if(v&&!running){running=true;requestAnimationFrame(frame)}else if(!v)running=false});io.observe(glass);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)running=false;else if(!running){running=true;requestAnimationFrame(frame)}});
+  requestAnimationFrame(frame);
+})();
+
+/* ---------- flywheel ---------- */
+(function(){
+  const labels=['More tokens launched','More chains + users','More cross-chain transfers','More protocol fees','More $OFT buybacks','More devs + launches'];
+  const cols=['--c1','--c2','--c3','--c4','--c5','--c7'];
+  const cx=200,cy=200,R=160;let h='';
+  labels.forEach((l,i)=>{const ang=(-90+i*60)*Math.PI/180;const c=Math.cos(ang),s=Math.sin(ang);
+    const x=cx+R*c,y=cy+R*s,lx=cx+(R+26)*c,ly=cy+(R+26)*s;
+    const anchor=Math.abs(c)<.2?'middle':(c>0?'start':'end');
+    const dy=s<-.9?-14:(s>.9?22:5);
+    h+=`<rect class="nd" x="${x-14}" y="${y-14}" width="28" height="28" style="stroke:var(${cols[i]})"/><text class="nn" x="${x}" y="${y+5}" text-anchor="middle" style="fill:var(${cols[i]})">${i+1}</text><text x="${lx}" y="${ly+dy}" text-anchor="${anchor}">${l}</text>`});
+  $('#nodes').innerHTML=h;
+  if(reduce){const d=$('#flyDot');d.parentNode.removeChild(d)}
+})();
+})();
+</script>
+</body>
+</html>
